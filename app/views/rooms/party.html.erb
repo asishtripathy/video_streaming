@@ -1,0 +1,50 @@
+<div id="invitation">Invite your friends! Share the url of this page http://opentok-videoparty.heroku.com/party/<%= @room.id %></div>
+<div id="videobox">
+
+</div>
+<div id="myPublisherDiv" ></div>
+<script src='http://static.opentok.com/v1.1/js/TB.min.js' type="text/javascript"></script>
+<script type="text/javascript">
+var apiKey = '22262222';
+//var sessionId = "2_MX4yMjIzMjM0Mn4xMjcuMC4wLjF-TW9uIERlYyAyNCAyMzozMjo0MSBQU1QgMjAxMn4wLjQ5NzE5NDIzfg";
+//var token = "T1==cGFydG5lcl9pZD0yMjIzMjM0MiZzaWc9ZDJiOWFiZDExMDM0ZTY2M2Q0MTRiMzE5OGVlYjZhMDY4ZTRmOTZkOTpzZXNzaW9uX2lkPTJfTVg0eU1qSXpNak0wTW40eE1qY3VNQzR3TGpGLVRXOXVJRVJsWXlBeU5DQXlNem96TWpvME1TQlFVMVFnTWpBeE1uNHdMalE1TnpFNU5ESXpmZyZjcmVhdGVfdGltZT0xMzU2NDIwNzc5JmV4cGlyZV90aW1lPTEzNTY1MDcxNzkmcm9sZT1wdWJsaXNoZXImY29ubmVjdGlvbl9kYXRhPSZub25jZT0xNzYzODI=";
+var sessionId = "<%= @room.sessionId %>";
+var token = "<%= @tok_token %>";
+
+function subscribeToStreams( streams ) {
+  for(var i= 0; i < streams.length; i++) {
+    var stream = streams[i];
+    if(session.connection.connectionId == stream.connection.connectionId ) {
+      return;
+    }
+    var div = document.createElement('div');
+    var divId = 'stream-'+stream.streamId;
+    div.setAttribute('id', divId);
+    document.body.appendChild( div );
+    session.subscribe( stream, divId, {width: '900', height: '400', mirror: false } );
+  }
+}
+
+function sessionConnectedHandler(sessionConnectedEvent ) {
+  alert('connected');
+  session.publish(publisher);
+  subscribeToStreams( sessionConnectedEvent.streams)
+}
+
+function streamCreatedHandler( streamCreatedEvent ) {
+  subscribeToStreams( streamCreatedEvent.streams );
+}
+var publisher = TB.initPublisher(apiKey, 'myPublisherDiv', {width: '500', height: '400'});
+//var publisher = TB.initPublisher(apiKey, 'myPublisherDiv', { publishVideo: false });
+
+//TB.addEventListener('exception', exceptionHandler);
+var session = TB.initSession(sessionId);
+
+//Video chat event listeners
+
+session.addEventListener('streamCreated', streamCreatedHandler);
+session.addEventListener('sessionConnected', sessionConnectedHandler);
+//session.addEventListener('streamDestroyed', streamDestroyedHandler);
+
+session.connect(apiKey, token);
+</script>
